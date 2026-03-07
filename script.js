@@ -627,8 +627,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Анимация при клике на конверт (Love Is секция)
     const loveisEnvelope = document.getElementById('loveis-envelope');
     if (loveisEnvelope) {
-        loveisEnvelope.addEventListener('click', () => {
+        loveisEnvelope.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent immediate close if click bubbles
             loveisEnvelope.classList.toggle('open');
+        });
+
+        // Закрывать при скролле
+        window.addEventListener('scroll', () => {
+            if (loveisEnvelope.classList.contains('open')) {
+                loveisEnvelope.classList.remove('open');
+            }
+        }, { passive: true });
+        
+        // Также закрывать при клике в любое другое место
+        document.addEventListener('click', (e) => {
+            if (!loveisEnvelope.contains(e.target) && loveisEnvelope.classList.contains('open')) {
+                loveisEnvelope.classList.remove('open');
+            }
         });
     }
 
