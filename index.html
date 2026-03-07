@@ -147,17 +147,27 @@
             <!-- Конверт с первым фото -->
             <div class="loveis-envelope-wrapper">
                 <div class="loveis-envelope" id="loveis-envelope">
-                    <div class="loveis-envelope-flap"></div>
-                    <div class="loveis-envelope-body">
-                        <div class="loveis-envelope-letter">
-                            <img src="img/LoveIs.jpg" alt="Love Is" class="loveis-envelope-photo">
-                            <div class="loveis-envelope-text">Мы с тобой прекрасные:)</div>
-                        </div>
+                    <!-- Задняя стенка (фон конверта) -->
+                    <div class="loveis-envelope-body"></div>
+                    
+                    <!-- Само письмо (фото + текст), лежит поверх задней стенки -->
+                    <div class="loveis-envelope-letter">
+                        <img src="img/LoveIs.jpg" alt="Love Is" class="loveis-envelope-photo">
+                        <div class="loveis-envelope-text">Мы с тобой прекрасные:)</div>
                     </div>
+                    
+                    <!-- Боковые стенки -->
+                    <div class="loveis-envelope-left"></div>
+                    <div class="loveis-envelope-right"></div>
+                    
+                    <!-- Передняя нижняя стенка -->
                     <div class="loveis-envelope-front">
                         <!-- Сургучная печать / Сердечко -->
                         <div class="loveis-envelope-seal">♥</div>
                     </div>
+                    
+                    <!-- Верхний клапан (крышка) -->
+                    <div class="loveis-envelope-flap"></div>
                 </div>
             </div>
             <div class="loveis-grid">

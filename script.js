@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loveisEnvelope = document.getElementById('loveis-envelope');
     if (loveisEnvelope) {
         loveisEnvelope.addEventListener('click', () => {
-            loveisEnvelope.classList.add('open');
+            loveisEnvelope.classList.toggle('open');
         });
     }
 

@@ -1242,76 +1242,107 @@ body {
     box-shadow: 0 15px 40px rgba(200, 50, 90, 0.25), inset 0 0 15px rgba(255,255,255,0.8);
 }
 
+/* Задняя часть конверта (где лежит письмо) */
 .loveis-envelope-body {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: #fce4ec;
+    background: #e8d0d5; /* Slightly darker pinkish-grey for interior depth */
     border-radius: 8px;
     z-index: 1;
     overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.08); /* Inner shadow for depth */
 }
 
+/* Верхний клапан (крышка) */
 .loveis-envelope-flap {
     position: absolute;
     top: 0;
     left: 0;
     width: 0;
     height: 0;
-    border-top: 110px solid #f8bbd0;
+    border-top: 110px solid #f8bbd0; /* Base top flap color */
     border-left: 150px solid transparent;
     border-right: 150px solid transparent;
-    z-index: 4;
+    z-index: 5;
     transform-origin: top;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.1));
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.6s step-end;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); /* strong drop shadow */
 }
 
+/* Боковые стенки */
+.loveis-envelope-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 150px solid #f48fb1;
+    border-top: 100px solid transparent;
+    border-bottom: 100px solid transparent;
+    z-index: 3;
+}
+
+.loveis-envelope-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-right: 150px solid #f48fb1;
+    border-top: 100px solid transparent;
+    border-bottom: 100px solid transparent;
+    z-index: 3;
+}
+
+/* Передняя нижняя стенка */
 .loveis-envelope-front {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 0;
     height: 0;
-    border-bottom: 120px solid #f48fb1;
+    border-bottom: 120px solid #f06292; /* Slightly darker pink for the bottom flap to add 3D feel */
     border-left: 150px solid transparent;
     border-right: 150px solid transparent;
-    z-index: 3;
+    z-index: 4;
     display: flex;
     justify-content: center;
     align-items: flex-end;
+    filter: drop-shadow(0 -3px 5px rgba(0,0,0,0.05)); /* shadow separating it from the flap */
 }
 
 .loveis-envelope-seal {
     position: absolute;
-    bottom: -110px; /* Centers the seal on the flap tip */
+    bottom: -105px; /* Centers the seal on the flap tip */
     left: -20px;
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #d81b60, #ad1457);
+    width: 45px;
+    height: 45px;
+    background: radial-gradient(circle at 30% 30%, #ec4f85, #ad1457, #660630); /* 3D wax look */
     border-radius: 50%;
-    color: white;
-    font-size: 20px;
+    color: #fff2f5;
+    font-size: 24px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.4);
-    z-index: 5;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.4);
+    z-index: 6; /* Always visible on top of front and flap */
+    transition: transform 0.5s cubic-bezier(0.3, 1.5, 0.5, 1), opacity 0.5s ease;
 }
 
 .loveis-envelope-letter {
     position: absolute;
     left: 50%;
-    bottom: 10px;
+    bottom: 5px; /* Stay inside the envelope pocket slightly deeper */
     transform: translateX(-50%);
-    width: 260px;
-    background: white;
-    border-radius: 10px;
+    width: 270px; /* Make it fit snugly */
+    background: #fff;
+    background-image: linear-gradient(to bottom, #fff 90%, #f9f9f9 100%); /* slightly paper texture */
+    border-radius: 8px;
     padding: 15px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15); /* shadow of the photo falling into pocket */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1321,10 +1352,12 @@ body {
 
 .loveis-envelope-photo {
     width: 100%;
-    height: auto;
+    height: 180px; /* set fixed height for picture display */
     object-fit: cover;
-    border-radius: 6px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 4px; /* classic photo edge */
+    border: 5px solid #fff; /* Polaroid style border */
+    border-bottom-width: 15px; /* Polaroid style bottom */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .loveis-envelope-text {
@@ -1350,18 +1383,24 @@ body {
 
 .loveis-envelope.open .loveis-envelope-flap {
     transform: rotateX(180deg);
-    z-index: 1;
+    z-index: 0; /* Goes behind the dark envelope body back-wall so the letter and back wall conceal it if viewed at angle. Actually, behind body = 0 */
+}
+
+/* Ensure the wrapper doesn't trap the rotated flap */
+.loveis-envelope {
+    transform-style: preserve-3d;
 }
 
 .loveis-envelope.open .loveis-envelope-seal {
-    transform: scale(0);
+    transform: scale(0) rotate(90deg); /* adds a nice twist */
     opacity: 0;
 }
 
+/* The photo popping out */
 .loveis-envelope.open .loveis-envelope-letter {
-    transform: translateX(-50%) translateY(-220px);
-    z-index: 5;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    transform: translateX(-50%) translateY(-145px); /* Emerging out of front pocket */
+    z-index: 6; /* Needs to be above the folded top flap, above side flaps, above bottom flap */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .loveis-envelope.open .loveis-envelope-text {
@@ -1371,35 +1410,49 @@ body {
 
 @media screen and (max-width: 480px) {
     .loveis-envelope {
-        width: 250px;
-        height: 166px;
+        width: 260px;
+        height: 173px;
     }
     .loveis-envelope-flap {
-        border-top-width: 90px;
-        border-left-width: 125px;
-        border-right-width: 125px;
+        border-top-width: 95px;
+        border-left-width: 130px;
+        border-right-width: 130px;
+    }
+    .loveis-envelope-left {
+        border-left-width: 130px;
+        border-top-width: 86.5px;
+        border-bottom-width: 86.5px;
+    }
+    .loveis-envelope-right {
+        border-right-width: 130px;
+        border-top-width: 86.5px;
+        border-bottom-width: 86.5px;
     }
     .loveis-envelope-front {
-        border-bottom-width: 100px;
-        border-left-width: 125px;
-        border-right-width: 125px;
+        border-bottom-width: 105px;
+        border-left-width: 130px;
+        border-right-width: 130px;
     }
     .loveis-envelope-letter {
-        width: 220px;
+        width: 230px;
         bottom: 5px;
     }
+    .loveis-envelope-photo {
+        height: 140px; /* smaller photo height on mobile */
+    }
     .loveis-envelope.open .loveis-envelope-letter {
-        transform: translateX(-50%) translateY(-185px);
+        transform: translateX(-50%) translateY(-120px);
     }
     .loveis-envelope-text {
         font-size: 1.2rem;
+        margin-top: 10px;
     }
     .loveis-envelope-seal {
-        bottom: -90px;
+        bottom: -95px;
         left: -15px;
-        width: 30px;
-        height: 30px;
-        font-size: 15px;
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
     }
 }
 
