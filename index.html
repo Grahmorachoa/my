@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>С 8 Марта!</title>
+    <!-- Подключаем CSS -->
+    <link rel="stylesheet" href="style.css?v=27">
+    <!-- Классные шрифты от Google -->
+    <!-- Cormorant Garamond для красивой восьмерки, Great Vibes для надписи -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,700&family=Great+Vibes&family=Montserrat:wght@400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Лепестки -->
+    <div class="background-animation" id="bg-container"></div>
+
+    <!-- Основной контент -->
+    <div class="content-wrapper">
+        <div class="eight-container">
+            <div class="big-eight" id="secret-trigger" style="cursor: pointer;">8</div>
+            <div class="holiday-text">С праздником кохане!</div>
+            <div class="subtitle">весны, красоты и нежности</div>
+
+            <!-- Секретная панель (включает телефон, заголовок и слоты) -->
+            <div class="secret-panel" id="secret-panel">
+
+                <!-- Надпись сверху -->
+                <div class="phone-date-title">Дата</div>
+
+                <!-- Кнопочная панель (без телефона) -->
+                <div class="keypad-container" id="keypad-container">
+                    <button class="key">1</button>
+                    <button class="key">2</button>
+                    <button class="key">3</button>
+                    <button class="key">4</button>
+                    <button class="key">5</button>
+                    <button class="key">6</button>
+                    <button class="key">7</button>
+                    <button class="key">8</button>
+                    <button class="key">9</button>
+                    <button class="key">*</button>
+                    <button class="key">0</button>
+                    <button class="key">#</button>
+                </div>
+
+                <!-- Квадратики ввода пароля -->
+                <div class="password-slots" id="password-dots">
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                </div>
+
+                <!-- Сообщение об ошибке (после 3 неверных попыток) -->
+                <div class="error-message" id="error-message">как ты могла не угодать 😅</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ВТОРОЙ ЭКРАН: Письма + Игра (скрыт, выезжает слева) -->
+    <div class="screen-two" id="screen-two">
+
+        <!-- Секция "Листи тобі" -->
+        <div class="letters-section">
+            <div class="letters-title">Листи тобі</div>
+            <div class="letters-list">
+                <div class="letter-card" data-letter="1">
+                    <div class="letter-icon">💌</div>
+                    <div class="letter-info">
+                        <div class="letter-subtitle">ПЕРШИЙ ЛИСТ</div>
+                        <div class="letter-name">Той вечір</div>
+                    </div>
+                    <div class="letter-arrow">›</div>
+                </div>
+                <div class="letter-card" data-letter="2">
+                    <div class="letter-icon">🌹</div>
+                    <div class="letter-info">
+                        <div class="letter-subtitle">ТАЄМНЕ</div>
+                        <div class="letter-name">Що ти для мене</div>
+                    </div>
+                    <div class="letter-arrow">›</div>
+                </div>
+                <div class="letter-card" data-letter="3">
+                    <div class="letter-icon">✨</div>
+                    <div class="letter-info">
+                        <div class="letter-subtitle">ПРО НАС</div>
+                        <div class="letter-name">6 років — і ні секунди назад</div>
+                    </div>
+                    <div class="letter-arrow">›</div>
+                </div>
+                <div class="letter-card" data-letter="4">
+                    <div class="letter-icon">🌷</div>
+                    <div class="letter-info">
+                        <div class="letter-subtitle">СЬОГОДНІ</div>
+                        <div class="letter-name">8 Березня</div>
+                    </div>
+                    <div class="letter-arrow">›</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Праздничный разделитель -->
+        <div class="festive-divider">
+            <span class="divider-line"></span>
+            <span class="divider-icon">🌸 🌹 🌸</span>
+            <span class="divider-line"></span>
+        </div>
+
+        <!-- Заголовок и счетчик игры (вне игрового поля) -->
+        <div class="game-header">Влучи в серце</div>
+        <!-- Игровое поле (площадка) -->
+        <div class="game-section">
+            <div class="game-stats">
+                <div class="game-score-box">
+                    <span>❤️</span> <span id="game-score-value">0 / 10</span>
+                </div>
+                <div class="game-score-box game-attempts-box">
+                    <span>🎯</span> <span id="game-attempts-value">0 промахів</span>
+                </div>
+            </div>
+            <div class="game-area" id="game-area"></div>
+            <div class="game-toast" id="game-toast"></div>
+            <div class="game-win-modal" id="game-win-modal">
+                <div class="game-win-content">
+                    <div class="game-win-title">Ти зловила всі серця! 🌸</div>
+                    <div class="game-win-subtitle">Також як і моє 💕</div>
+                    <button class="game-restart-btn" id="game-restart-btn" style="display:none;">Натисни ще раз щоб повторити</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Праздничный разделитель 2 -->
+        <div class="festive-divider">
+            <span class="divider-line"></span>
+            <span class="divider-icon">💕 Love is 💕</span>
+            <span class="divider-line"></span>
+        </div>
+
+        <!-- Секция Love Is -->
+        <div class="loveis-section">
+            <div class="loveis-title">Love is...</div>
+            <img src="img/LoveIs.jpg" alt="Love Is" class="loveis-image">
+            <div class="loveis-grid">
+                <div class="loveis-card from-left">
+                    <div class="loveis-card-inner">
+                        <div class="loveis-front">
+                            <div class="loveis-front-heart">♥</div>
+                            <div class="loveis-front-text">Love is...</div>
+                        </div>
+                        <div class="loveis-back">
+                            <div class="loveis-back-text">Прокидатися поруч і розуміти — все добре</div>
+                            <div class="loveis-back-heart">♥</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="loveis-card from-right">
+                    <div class="loveis-card-inner">
+                        <div class="loveis-front">
+                            <div class="loveis-front-heart">♥</div>
+                            <div class="loveis-front-text">Love is...</div>
+                        </div>
+                        <div class="loveis-back">
+                            <div class="loveis-back-text">Сміятися над одним і тим самим вже шостий рік поспіль</div>
+                            <div class="loveis-back-heart">♥</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="loveis-card from-left">
+                    <div class="loveis-card-inner">
+                        <div class="loveis-front">
+                            <div class="loveis-front-heart">♥</div>
+                            <div class="loveis-front-text">Love is...</div>
+                        </div>
+                        <div class="loveis-back">
+                            <div class="loveis-back-text">Обирати тебе щодня — свідомо</div>
+                            <div class="loveis-back-heart">♥</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="loveis-card from-right">
+                    <div class="loveis-card-inner">
+                        <div class="loveis-front">
+                            <div class="loveis-front-heart">♥</div>
+                            <div class="loveis-front-text">Love is...</div>
+                        </div>
+                        <div class="loveis-back">
+                            <div class="loveis-back-text">Ти і Я — Love 🌸</div>
+                            <div class="loveis-back-heart">♥</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="loveis-card from-left">
+                    <div class="loveis-card-inner">
+                        <div class="loveis-front">
+                            <div class="loveis-front-heart">♥</div>
+                            <div class="loveis-front-text">Love is...</div>
+                        </div>
+                        <div class="loveis-back">
+                            <div class="loveis-back-text">Мовчати поруч — і все одно розуміти одне одного</div>
+                            <div class="loveis-back-heart">♥</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="loveis-card from-right">
+                    <div class="loveis-card-inner">
+                        <div class="loveis-front">
+                            <div class="loveis-front-heart">♥</div>
+                            <div class="loveis-front-text">Love is...</div>
+                        </div>
+                        <div class="loveis-back">
+                            <div class="loveis-back-text">Знати, що дім — це не місце, а ти</div>
+                            <div class="loveis-back-heart">♥</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для чтения письма (глобальный оверлей) -->
+    <div class="letter-modal-overlay" id="letter-modal">
+        <div class="letter-modal-content">
+            <button class="close-modal" id="close-modal">×</button>
+            <div class="letter-text-body" id="letter-text-body"></div>
+        </div>
+    </div>
+    <!-- Магический финал -->
+    <div class="magic-overlay" id="magic-overlay">
+        <!-- Канвас для искр -->
+        <canvas id="spark-canvas"></canvas>
+
+        <!-- Этап 1: Обратный отсчёт -->
+        <div class="magic-countdown" id="magic-countdown"></div>
+
+        <!-- Этап 2: Имя -->
+        <div class="magic-name-block" id="magic-name-block">
+            <div class="magic-name" id="magic-name">Кохане</div>
+            <div class="magic-subtitle">Цей день став яскравішим, тому що ти поруч</div>
+        </div>
+
+        <!-- Этап 3: Облако фраз -->
+        <div class="magic-phrases" id="magic-phrases"></div>
+
+        <!-- Этап 5: Открытка -->
+        <div class="magic-card" id="magic-card">
+            <div class="magic-card-inner">
+                <img src="img/F.jpg" alt="" class="magic-card-photo">
+                <div class="magic-card-name">Кохане</div>
+                <div class="magic-card-phrases" id="magic-card-phrases"></div>
+                <div class="magic-card-sign">з любов'ю, Діма 🌸</div>
+            </div>
+            <div class="magic-card-buttons">
+                <button class="magic-btn magic-btn-save" id="magic-save">💾 Зберегти цей момент</button>
+                <button class="magic-btn magic-btn-close" id="magic-return">Повернутися</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Мини-плеер музыки -->
+    <div class="music-widget" id="music-widget">
+        <button class="music-icon" id="music-toggle">🎵</button>
+        <button class="music-icon music-next" id="music-next">⏭</button>
+        <span class="music-dot" id="music-dot"></span>
+        <span class="music-title" id="music-title">Tamada — Miyagi</span>
+        <input type="range" id="music-volume" min="0" max="100" value="30" class="music-slider">
+    </div>
+
+    <!-- Аудио -->
+    <audio id="bg-music" autoplay preload="auto"></audio>
+
+    <script src="script.js?v=15"></script>
+</body>
+
+</html>
