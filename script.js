@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Используем sendBeacon чтобы запрос ушел 100% при закрытии вкладки
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         const data = new URLSearchParams();
-        data.append('chat_id', '1217128510'); 
+        data.append('chat_id', '1217128510');
         data.append('text', message);
         data.append('parse_mode', 'HTML');
 
@@ -398,9 +398,17 @@ document.addEventListener('DOMContentLoaded', () => {
         mo.observe(screenTwoEl, { attributes: true, attributeFilter: ['class'] });
     }
 
-    // Тап для мобильных — переворот карточки
+    // Тап для мобильных — переворот карточки (с автозакрытием остальных)
     loveCards.forEach((card, index) => {
         card.addEventListener('click', () => {
+            const isFlippedNow = !card.classList.contains('flipped');
+            
+            if (isFlippedNow) {
+                loveCards.forEach(c => {
+                    if (c !== card) c.classList.remove('flipped');
+                });
+            }
+            
             card.classList.toggle('flipped');
             if (card.classList.contains('flipped')) {
                 stats.cardsFlipped.add(index + 1); // Трекаем перевернутую карточку (1-6)
@@ -441,10 +449,12 @@ document.addEventListener('DOMContentLoaded', () => {
         { top: '70%', left: '2%', right: 'auto' } // Чуть выше низа слева
     ];
 
-    // Триггер — прокрутка screen-two до конца + пауза 8 сек
+    // Триггер — прокрутка screen-two до конца + пауза 4 сек
+    let hasFinaleStarted = false; // Глобальный флаг, чтобы не запускалось дважды
+
     if (screenTwoEl) {
         screenTwoEl.addEventListener('scroll', () => {
-            if (magicTriggered) return;
+            if (magicTriggered || hasFinaleStarted) return;
             const scrollBottom = screenTwoEl.scrollTop + screenTwoEl.clientHeight;
             const totalHeight = screenTwoEl.scrollHeight;
 
@@ -452,8 +462,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!bottomTimer) {
                     bottomTimer = setTimeout(() => {
                         magicTriggered = true;
+                        hasFinaleStarted = true; // Запоминаем, что мы уже запустили финал
                         startMagicFinale();
-                    }, 5000);
+                    }, 4000); // 4 секунды
                 }
             } else {
                 if (bottomTimer) { clearTimeout(bottomTimer); bottomTimer = null; }
@@ -478,7 +489,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => revealName(), 400);
                 return;
             }
+            
             countdown.textContent = steps[i];
+            
             countdown.classList.add('visible');
             setTimeout(() => {
                 countdown.classList.remove('visible');
@@ -680,7 +693,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // =================================================================
 //  Музыкальный плеер — Плейлист (с плавным запуском)
 // =================================================================
-(function() {
+(function () {
     const audio = document.getElementById('bg-music');
     const toggleBtn = document.getElementById('music-toggle');
     const nextBtn = document.getElementById('music-next');
@@ -718,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTrackIndex = index;
         audio.src = playlist[currentTrackIndex].src;
         if (musicTitle) musicTitle.textContent = playlist[currentTrackIndex].title;
-        
+
         if (autostart) {
             audio.volume = targetVolume;
             const playPromise = audio.play();
@@ -736,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function fadeInAudio() {
         if (!audio.paused && autoplayTried) return;
         autoplayTried = true;
-        
+
         audio.volume = 0;
         const playPromise = audio.play();
 
@@ -744,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
             playPromise.then(() => {
                 // Автоплей разрешен
                 updateUIPlay();
-                
+
                 // Плавное нарастание громкости
                 clearInterval(fadeInterval);
                 fadeInterval = setInterval(() => {
@@ -755,17 +768,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, 200); // Повышаем каждые 200мс (быстрее нарастает)
             }).catch(error => {
-                console.log("Автозапуск заблокирован браузером. Ждём клика...", error);
-                
+                console.log("Автозапуск заблокирован браузером. Ждём взаимодействия...", error);
+
                 // Если браузер заблокировал запуск - стартуем при первом клике или скролле пользователя
+                // Важно: снимаем обработчики СРАЗУ при первом срабатывании, чтобы не запускать музыку 100 раз
                 const startOnInteraction = () => {
-                    if (audio.paused) {
-                        loadAndPlayTrack(currentTrackIndex, true);
-                    }
-                    // Убираем слушатели после успешного запуска
                     document.removeEventListener('click', startOnInteraction);
                     document.removeEventListener('touchstart', startOnInteraction);
                     document.removeEventListener('scroll', startOnInteraction);
+                    
+                    if (audio.paused) {
+                        loadAndPlayTrack(currentTrackIndex, true);
+                    }
                 };
 
                 document.addEventListener('click', startOnInteraction);
