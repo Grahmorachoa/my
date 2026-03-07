@@ -402,13 +402,13 @@ document.addEventListener('DOMContentLoaded', () => {
     loveCards.forEach((card, index) => {
         card.addEventListener('click', () => {
             const isFlippedNow = !card.classList.contains('flipped');
-            
+
             if (isFlippedNow) {
                 loveCards.forEach(c => {
                     if (c !== card) c.classList.remove('flipped');
                 });
             }
-            
+
             card.classList.toggle('flipped');
             if (card.classList.contains('flipped')) {
                 stats.cardsFlipped.add(index + 1); // Трекаем перевернутую карточку (1-6)
@@ -444,8 +444,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Позиции фраз (top%, left%)
     const phrasePositions = [
         { top: '8%', left: '5%', right: 'auto' }, // Верх слева
-        { top: '85%', left: 'auto', right: '5%' }, // Низ справа
-        { top: '25%', left: 'auto', right: '2%' }, // Чуть ниже верха справа
+        { top: '80%', left: 'auto', right: '5%' }, // Низ справа
+        { top: '20%', left: 'auto', right: '2%' }, // Чуть ниже верха справа
         { top: '70%', left: '2%', right: 'auto' } // Чуть выше низа слева
     ];
 
@@ -489,9 +489,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => revealName(), 400);
                 return;
             }
-            
+
             countdown.textContent = steps[i];
-            
+
             countdown.classList.add('visible');
             setTimeout(() => {
                 countdown.classList.remove('visible');
@@ -623,22 +623,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cardEl) cardEl.classList.add('visible');
         }, 1600);
     }
-    
+
     // Анимация при клике на конверт (Love Is секция)
     const loveisEnvelope = document.getElementById('loveis-envelope');
+    const screenTwo = document.getElementById('screen-two');
+
     if (loveisEnvelope) {
         loveisEnvelope.addEventListener('click', (e) => {
             e.stopPropagation(); // Prevent immediate close if click bubbles
             loveisEnvelope.classList.toggle('open');
         });
 
-        // Закрывать при скролле
-        window.addEventListener('scroll', () => {
-            if (loveisEnvelope.classList.contains('open')) {
-                loveisEnvelope.classList.remove('open');
-            }
-        }, { passive: true });
-        
+        // Закрывать при скролле в контейнере screen-two
+        if (screenTwo) {
+            screenTwo.addEventListener('scroll', () => {
+                if (loveisEnvelope.classList.contains('open')) {
+                    loveisEnvelope.classList.remove('open');
+                }
+            }, { passive: true });
+        }
+
         // Также закрывать при клике в любое другое место
         document.addEventListener('click', (e) => {
             if (!loveisEnvelope.contains(e.target) && loveisEnvelope.classList.contains('open')) {
@@ -799,7 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.removeEventListener('click', startOnInteraction);
                     document.removeEventListener('touchstart', startOnInteraction);
                     document.removeEventListener('scroll', startOnInteraction);
-                    
+
                     if (audio.paused) {
                         loadAndPlayTrack(currentTrackIndex, true);
                     }
