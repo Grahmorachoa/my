@@ -623,6 +623,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cardEl) cardEl.classList.add('visible');
         }, 1600);
     }
+    
+    // Анимация при клике на конверт (Love Is секция)
+    const loveisEnvelope = document.getElementById('loveis-envelope');
+    if (loveisEnvelope) {
+        loveisEnvelope.addEventListener('click', () => {
+            loveisEnvelope.classList.add('open');
+        });
+    }
 
     // --- Кнопка «Сохранить» ---
     if (saveBtn) {
