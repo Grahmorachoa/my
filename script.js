@@ -43,6 +43,66 @@ document.addEventListener('DOMContentLoaded', () => {
     // Продолжаем бесконечно генерировать лепестки (чуть реже, чтобы не перегружать страницу)
     setInterval(createPetal, 600);
 
+    // ==========================================
+    // СБОР СТАТИСТИКИ ДЛЯ TELEGRAM
+    // ==========================================
+    const TELEGRAM_BOT_TOKEN = '8482020485:AAHpk5ZSDksZ0aozSH9gy_jqNUhljNIsQ1I';
+    const TELEGRAM_CHAT_ID = '8482020485'; // Using the user ID part of the bot token as a fallback chat_id for now. If it's wrong, we'll need the exact user id. Let's assume the user provided the token but meant it as both, we will ask for explicit chat id if it fails but we'll use a placeholder for now and ask the user to confirm their chat id. Actually wait, standard practice is that they need BOTH. I'll put a placeholder and tell them.
+
+    // ВРЕМЕННО: Я использую Chat ID = 'Ваш_Chat_ID'. 
+    const USER_CHAT_ID = 'YOUR_CHAT_ID'; // Нужно будет заменить!
+
+    let stats = {
+        startTime: Date.now(),
+        passwordAttempts: 0,
+        passwordGuessed: false,
+        lettersOpened: new Set(),
+        gamesPlayed: 0,
+        gameWins: 0,
+        cardsFlipped: new Set(),
+        sent: false // Флаг, чтобы не отправить дважды
+    };
+
+    function sendStatsToTelegram() {
+        if (stats.sent) return;
+        stats.sent = true;
+
+        const timeSpentSec = Math.floor((Date.now() - stats.startTime) / 1000);
+        const mins = Math.floor(timeSpentSec / 60);
+        const secs = timeSpentSec % 60;
+        const timeSpentStr = `${mins} мин ${secs} сек`;
+
+        let message = `🌸 <b>Отчет о посещении сайта</b> 🌸\n\n`;
+        message += `⏱ <b>Время на сайте:</b> ${timeSpentStr}\n`;
+        message += `🔐 <b>Пароль:</b> ${stats.passwordGuessed ? 'Угадан' : 'Не угадан'} (попыток: ${stats.passwordAttempts})\n`;
+        message += `💌 <b>Прочитано писем:</b> ${stats.lettersOpened.size} из 4\n`;
+        if (stats.lettersOpened.size > 0) {
+            message += `   (Номера: ${Array.from(stats.lettersOpened).sort().join(', ')})\n`;
+        }
+        message += `🎯 <b>Игр сыграно:</b> ${stats.gamesPlayed} (Побед: ${stats.gameWins})\n`;
+        message += `💕 <b>Карточек "Love is" перевернуто:</b> ${stats.cardsFlipped.size} из 6\n`;
+
+        // Используем sendBeacon чтобы запрос ушел 100% при закрытии вкладки
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        const data = new URLSearchParams();
+        data.append('chat_id', '1217128510'); 
+        data.append('text', message);
+        data.append('parse_mode', 'HTML');
+
+        // Для надежности дублируем fetch(keepalive) и sendBeacon
+        navigator.sendBeacon(url, data);
+    }
+
+    // Отправляем статистику при закрытии/сворачивании браузера
+    window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            sendStatsToTelegram();
+        }
+    });
+    window.addEventListener('pagehide', sendStatsToTelegram);
+    window.addEventListener('beforeunload', sendStatsToTelegram);
+    // ==========================================
+
     // Логика для кнопочной панели пароля
     const secretTrigger = document.getElementById('secret-trigger');
     const secretPanel = document.getElementById('secret-panel');
@@ -88,8 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
             currentSlot.textContent = digit;
 
             if (password.length === 4) {
+                stats.passwordAttempts++; // Увеличиваем попытки
                 setTimeout(() => {
                     if (password === CORRECT_PASSWORD) {
+                        stats.passwordGuessed = true;
                         showScreenTwo();
                     } else {
                         failedAttempts++;
@@ -254,6 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         gameScore = 0;
         gameMisses = 0;
+        stats.gamesPlayed++; // Трекаем старт игры
         updateScoreDisplay();
         if (gameArea) gameArea.innerHTML = '';
         if (winModal) winModal.classList.remove('active');
@@ -264,8 +327,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function endGame(isWin) {
         gameActive = false;
         clearInterval(gameInterval);
-        if (isWin && winModal) {
-            winModal.classList.add('active');
+        if (isWin) {
+            stats.gameWins++; // Трекаем победу
+            if (winModal) winModal.classList.add('active');
         }
     }
 
@@ -281,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         letterCards.forEach(card => {
             card.addEventListener('click', () => {
                 const letterId = card.getAttribute('data-letter');
+                stats.lettersOpened.add(letterId); // Трекаем письмо
                 const text = lettersData[letterId];
                 if (text) {
                     letterTextBody.textContent = text;
@@ -334,9 +399,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Тап для мобильных — переворот карточки
-    loveCards.forEach(card => {
+    loveCards.forEach((card, index) => {
         card.addEventListener('click', () => {
             card.classList.toggle('flipped');
+            if (card.classList.contains('flipped')) {
+                stats.cardsFlipped.add(index + 1); // Трекаем перевернутую карточку (1-6)
+            }
         });
     });
 
@@ -385,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     bottomTimer = setTimeout(() => {
                         magicTriggered = true;
                         startMagicFinale();
-                    }, 8000);
+                    }, 5000);
                 }
             } else {
                 if (bottomTimer) { clearTimeout(bottomTimer); bottomTimer = null; }

@@ -831,8 +831,8 @@ body {
 }
 
 .loveis-image {
-    width: 70%;
-    max-width: 280px;
+    width: 100%;
+    max-width: 320px;
     border-radius: 18px;
     margin-bottom: 25px;
     box-shadow:
@@ -853,7 +853,7 @@ body {
 /* --- Карточка --- */
 .loveis-card {
     height: 180px;
-    width: 90%;
+    width: 100%;
     max-width: 320px;
     cursor: pointer;
     opacity: 0;
@@ -1338,7 +1338,8 @@ body {
         align-items: center;
     }
     .loveis-card {
-        width: 180px;
+        width: 100%;
+        max-width: 320px;
         height: 230px;
     }
     .loveis-front, .loveis-back {
