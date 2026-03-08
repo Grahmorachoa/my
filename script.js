@@ -670,27 +670,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const screenTwo = document.getElementById('screen-two');
 
     if (loveisEnvelope) {
+        const envelopeLetter = loveisEnvelope.querySelector('.loveis-envelope-letter');
+
+        // Для мгновенного закрытия: сначала снаем opacity, потом убираем класс
+        function closeEnvelope() {
+            if (!loveisEnvelope.classList.contains('open')) return;
+            // 1. Мгновенно снимаем отображение письма без анимации
+            if (envelopeLetter) {
+                envelopeLetter.style.transition = 'none';
+                envelopeLetter.style.opacity = '0';
+            }
+            // 2. Через небольшой таймаут убираем класс open
+            setTimeout(() => {
+                loveisEnvelope.classList.remove('open');
+                // 3. Восстанавливаем транзиции для следующего открытия
+                if (envelopeLetter) {
+                    envelopeLetter.style.transition = '';
+                }
+            }, 50);
+        }
+
         loveisEnvelope.addEventListener('click', (e) => {
             e.stopPropagation();
-            loveisEnvelope.classList.toggle('open');
             if (loveisEnvelope.classList.contains('open')) {
-                stats.envelopeOpened = true; // записываем факт открытия
+                closeEnvelope();
+            } else {
+                // Сбрасываем стиль перед открытием (на случай если застряло)
+                if (envelopeLetter) envelopeLetter.style.transition = '';
+                loveisEnvelope.classList.add('open');
+                stats.envelopeOpened = true;
             }
         });
 
         // Закрывать при скролле в контейнере screen-two
         if (screenTwo) {
             screenTwo.addEventListener('scroll', () => {
-                if (loveisEnvelope.classList.contains('open')) {
-                    loveisEnvelope.classList.remove('open');
-                }
+                closeEnvelope();
             }, { passive: true });
         }
 
         // Также закрывать при клике в любое другое место
         document.addEventListener('click', (e) => {
-            if (!loveisEnvelope.contains(e.target) && loveisEnvelope.classList.contains('open')) {
-                loveisEnvelope.classList.remove('open');
+            if (!loveisEnvelope.contains(e.target)) {
+                closeEnvelope();
             }
         });
     }
