@@ -672,22 +672,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loveisEnvelope) {
         const envelopeLetter = loveisEnvelope.querySelector('.loveis-envelope-letter');
 
-        // Для мгновенного закрытия: сначала снаем opacity, потом убираем класс
         function closeEnvelope() {
             if (!loveisEnvelope.classList.contains('open')) return;
-            // 1. Мгновенно снимаем отображение письма без анимации
             if (envelopeLetter) {
+                // Мгновенно убираем все анимации и возвращаем в спрятанное положение
                 envelopeLetter.style.transition = 'none';
                 envelopeLetter.style.opacity = '0';
+                envelopeLetter.style.transform = 'translateX(-50%)'; // сброс позиции
+                envelopeLetter.style.bottom = '-320px';              // в карман конверта
             }
-            // 2. Через небольшой таймаут убираем класс open
-            setTimeout(() => {
-                loveisEnvelope.classList.remove('open');
-                // 3. Восстанавливаем транзиции для следующего открытия
-                if (envelopeLetter) {
-                    envelopeLetter.style.transition = '';
-                }
-            }, 50);
+            // Два rAF: гарантируем что браузер применил inline стили до смены класса
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    loveisEnvelope.classList.remove('open');
+                    // Восстанавливаем CSS-транзиции для следующего открытия
+                    if (envelopeLetter) {
+                        envelopeLetter.style.transition = '';
+                        envelopeLetter.style.transform = '';
+                        envelopeLetter.style.bottom = '';
+                    }
+                });
+            });
         }
 
         loveisEnvelope.addEventListener('click', (e) => {
