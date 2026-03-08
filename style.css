@@ -1886,13 +1886,13 @@ body {
 .ll-date {
     color: #cda85c;
     letter-spacing: 6px;
-    font-size: 28px; /* Doubled from 14px */
+    font-size: 19px; /* Reduced by 1.5x from 28px */
     font-family: monospace;
     margin-bottom: 20px;
 }
 
 .ll-title {
-    font-size: 144px; /* Doubled from 72px */
+    font-size: 96px; /* Reduced by 1.5x from 144px */
     font-weight: normal;
     letter-spacing: 4px;
     margin: 0;
@@ -1921,7 +1921,8 @@ body {
 }
 
 .ll-typed-container {
-    font-size: 64px; /* Doubled from 32px */
+    font-size: 42px; /* Reduced by 1.5x from 64px */
+    color: #f7e0b5; /* Желтый/Золотистый цвет */
     font-style: italic;
     line-height: 1.8;
     margin: 20px 0;
@@ -1931,20 +1932,20 @@ body {
 /* На компе: еще больше шрифты */
 @media (min-width: 1024px) {
     .ll-typed-container {
-        font-size: 80px; /* Doubled from 40px */
+        font-size: 54px; /* Reduced by 1.5x from 80px */
     }
     .ll-title, .ll-signature {
-        font-size: 168px; /* Doubled from 84px */
+        font-size: 112px; /* Reduced by 1.5x from 168px */
     }
 }
 
 /* Мобилки */
 @media (max-width: 768px) {
     .ll-typed-container {
-        font-size: 48px; /* Doubled from 24px */
+        font-size: 32px; /* Reduced by 1.5x from 48px */
     }
     .ll-title, .ll-signature {
-        font-size: 112px; /* Doubled from 56px */
+        font-size: 74px; /* Reduced by 1.5x from 112px */
     }
 }
 
@@ -1971,7 +1972,7 @@ body {
 }
 
 .ll-signature {
-    font-size: 144px; /* Doubled from 72px */
+    font-size: 96px; /* Reduced by 1.5x from 144px */
     font-family: 'Cormorant Garamond', serif;
     letter-spacing: 4px;
     transition: opacity 2s ease-in-out;
@@ -2007,9 +2008,9 @@ body {
 /* Адаптив для финального письма */
 @media (max-width: 768px) {
     .ll-title, .ll-signature {
-        font-size: 80px; /* Doubled from 40px */
+        font-size: 54px; /* Balanced reduction */
     }
     .ll-typed-container {
-        font-size: 40px; /* Doubled */
+        font-size: 28px; /* Balanced reduction */
     }
 }
