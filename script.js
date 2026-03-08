@@ -60,9 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
         gamesPlayed: 0,
         gameWins: 0,
         cardsFlipped: new Set(),
-        envelopeOpened: false, // Открыт ли конверт в Love Is
-        magicCardShown: false, // Показала ли финальная карточка
-        sent: false // Флаг, чтобы не отправить дважды
+        envelopeOpened: false, 
+        magicCardShown: false,
+        finalLetterViewed: false,
+        finalLetterClosed: false,
+        sent: false
     };
 
     // Названия писем (для отчёта Telegram)
@@ -79,6 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Мгновенное уведомление при заходе на сайт
     function sendVisitNotification() {
+        // Защита от спама при тестировании на локальном ПК
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return; 
+        }
+
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         const data = new URLSearchParams();
         data.append('chat_id', '1217128510');
@@ -90,6 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sendVisitNotification(); // Сразу при загрузке страницы
 
     function sendStatsToTelegram() {
+        // Не отправлять статистику, если это тест с ПК (локальный сервер)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return;
+        }
+
         if (stats.sent) return;
         stats.sent = true;
 
@@ -122,6 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         message += `✉️ <b>Конверт:</b> ${stats.envelopeOpened ? 'Открыла 💌' : 'Не открывала'}\n`;
         message += `✨ <b>Финальная карточка:</b> ${stats.magicCardShown ? 'Увидела 🌟' : 'Не дошла'}\n`;
+        message += `🖼️ <b>Главное фото:</b> ${stats.finalLetterViewed ? 'Посмотрела 💖' : 'Не открыла'}\n`;
+        if (stats.finalLetterClosed) message += `✖️ <b>Закрыла финал:</b> Да\n`;
 
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         const data = new URLSearchParams();
@@ -138,7 +152,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     window.addEventListener('pagehide', sendStatsToTelegram);
-    window.addEventListener('beforeunload', sendStatsToTelegram);
+
+    // Предупреждение при закрытии, если пользователь ещё не увидел скрытое сообщение
+    window.addEventListener('beforeunload', (e) => {
+        sendStatsToTelegram(); // отправляем статистику
+
+        // Если финальная карточка ещё не была показана — предупреждаем
+        if (!hasRevealedSecret) {
+            e.preventDefault();
+            // Современные браузеры игнорируют кастомный текст, но стандартный диалог всё равно появится
+            e.returnValue = 'Ти точно хочеш це пропустити? 🌸 Тут є щось важливе для тебе...';
+            return e.returnValue;
+        }
+    });
     // ==========================================
 
     // Логика для кнопочной панели пароля
@@ -239,10 +265,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ЛОГИКА ОТОБРАЖЕНИЯ ВТОРОГО ЭКРАНА ---
     const lettersData = {
-        "1": "Пам'ятаєш? Жовтень 2018. Ти прийшла з роботи — вид «я тут випадково». Але ти всміхнулась — і все. Я тоді ще не знав, що це назавжди. А виявилось — так.\n\nтвій Діма 🌸",
-        "2": "Є люди, які входять у твоє життя — і ти відразу розумієш: ось воно. Ти саме така. Не ідеальна в кіношному сенсі — краща. Справжня. Тепла. Моя.\n\nкохаю 🌸",
-        "3": "Скільки п'ятничних вечорів на дивані. Скільки «нікуди не йдемо». Скільки піц, серіалів, дурниць і сміху. Хотів би повторити кожен день. Навіть той з піцою що не вийшла.\n\nДи 🌸",
-        "4": "Сьогодні — твій день. Але чесно? Кожен день з тобою — вже свято. Просто цього разу я написав це на папері. Або на екрані. Але серцем — точно на папері.\n\nз усією любов'ю 🌸"
+        "1": "Маґдак. Ти прийшла після роботи — вид \"я тут випадково\". Усміхнулась — і все.\n\nтвій Діма 🌸",
+        "2": "Нічна зупинка. Перший поцілунок. Мороз по тілу.\n\nтвій Діма 🌸",
+        "3": "«Допоможеш зробити піцу?» — «Я в гостях». Піца не вийшла. Але ця сцена лишається назавжди.\n\nкохаю 🌸",
+        "4": "Диван, серіал, нікуди не йдемо. Найкращий сценарій тижня.\n\nДи 🌸",
+        "5": "Ти страшенно боялася. Маріо з \"хворим серцем\" все одно не злякав тебе. Вираз обличчя — безцінний кадр.\n\nз усією любов'ю 🌸"
     };
 
     // Показать второй экран (Листы + Игра) - вызывается после верного пароля или 3 ошибок
@@ -437,6 +464,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Тап для мобильных — переворот карточки (с автозакрытием остальных)
+    let flippedCardsCount = 0;
+    const flippedCardIndexes = new Set();
+    let hasRevealedSecret = false; // флаг: видела ли пользователь секретную кнопку
+    const magicTriggerBtnContainer = document.getElementById('final-trigger-wrapper');
+    
+    // Кнопка уже скрыта в HTML через style="display:none"
+
     loveCards.forEach((card, index) => {
         card.addEventListener('click', () => {
             const isFlippedNow = !card.classList.contains('flipped');
@@ -450,6 +484,29 @@ document.addEventListener('DOMContentLoaded', () => {
             card.classList.toggle('flipped');
             if (card.classList.contains('flipped')) {
                 stats.cardsFlipped.add(index + 1); // Трекаем перевернутую карточку (1-6)
+                
+                // Проверяем, открыли ли мы все уникальные карточки
+                if (!flippedCardIndexes.has(index)) {
+                    flippedCardIndexes.add(index);
+                    flippedCardsCount++;
+                    
+                    // Если просмотрели все карточки — автоматически запускаем финал через 2 секунды
+                    if (flippedCardsCount === loveCards.length && !hasRevealedSecret) {
+                        hasRevealedSecret = true;
+                        setTimeout(() => {
+                            // Прокрутка вниз для красивого старта
+                            if (screenTwoEl) {
+                                screenTwoEl.scrollTo({ top: screenTwoEl.scrollHeight, behavior: 'smooth' });
+                            }
+                            // Запускаем магический финал
+                            if (!magicTriggered && !hasFinaleStarted) {
+                                magicTriggered = true;
+                                hasFinaleStarted = true;
+                                startMagicFinale();
+                            }
+                        }, 2000);
+                    }
+                }
             }
         });
     });
@@ -487,26 +544,20 @@ document.addEventListener('DOMContentLoaded', () => {
         { top: '70%', left: '2%', right: 'auto' } // Чуть выше низа слева
     ];
 
-    // Триггер — прокрутка screen-two до конца + пауза 4 сек
     let hasFinaleStarted = false; // Глобальный флаг, чтобы не запускалось дважды
 
-    if (screenTwoEl) {
-        screenTwoEl.addEventListener('scroll', () => {
+    // Привязываем запуск финала к нажатию на кнопку-финал
+    const secretTriggerBtn = document.getElementById('final-trigger-btn');
+    if (secretTriggerBtn) {
+        secretTriggerBtn.addEventListener('click', () => {
             if (magicTriggered || hasFinaleStarted) return;
-            const scrollBottom = screenTwoEl.scrollTop + screenTwoEl.clientHeight;
-            const totalHeight = screenTwoEl.scrollHeight;
+            
+            // Прячем саму кнопку после нажатия, чтобы она не мешала
+            if (magicTriggerBtnContainer) magicTriggerBtnContainer.style.display = 'none';
 
-            if (scrollBottom >= totalHeight - 30) {
-                if (!bottomTimer) {
-                    bottomTimer = setTimeout(() => {
-                        magicTriggered = true;
-                        hasFinaleStarted = true; // Запоминаем, что мы уже запустили финал
-                        startMagicFinale();
-                    }, 4000); // 4 секунды
-                }
-            } else {
-                if (bottomTimer) { clearTimeout(bottomTimer); bottomTimer = null; }
-            }
+            magicTriggered = true;
+            hasFinaleStarted = true;
+            startMagicFinale();
         });
     }
 
@@ -784,8 +835,131 @@ document.addEventListener('DOMContentLoaded', () => {
             if (cardEl) cardEl.classList.remove('visible');
             if (sparkCtx) sparkCtx.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height);
             magicTriggered = false;
+            
+            // Запустить анимацию печатания финала
+            startFinalLetterAnimation();
         }, 1600);
     }
+
+    // --- Анимация финального текста (пишется пером) ---
+    function startFinalLetterAnimation() {
+        const section = document.getElementById("love-letter-target");
+        const textContainer = document.getElementById("ll-typed-text");
+        const pen = document.getElementById("ll-pen");
+        const signature = document.getElementById("ll-sign");
+
+        if (!section || !textContainer) return;
+
+        // Трекаем просмотр
+        stats.finalLetterViewed = true;
+
+
+        // Показываем секцию как оверлей
+        section.style.display = 'flex';
+        setTimeout(() => {
+            section.classList.add('active');
+        }, 50);
+
+        // Обновим обработчик кнопки закрытия (если еще не добавлен)
+        const closeBtn = document.getElementById("ll-close-btn");
+        if (closeBtn && !closeBtn.onclick) {
+            closeBtn.onclick = () => {
+                section.classList.remove('active');
+                setTimeout(() => {
+                    section.style.display = 'none';
+                    // Сбрасываем текст если нужно будет открыть снова
+                    textContainer.innerHTML = '';
+                }, 1000);
+
+                // Трекаем закрытие и отправляем финальную статистику
+                stats.finalLetterClosed = true;
+                sendStatsToTelegram();
+            };
+        }
+
+        const textLines = "Дякую за кожен прожитий момент.<br>За сміх, тишу, п'ятниці на дивані.<br>За Тебе.";
+        let i = 0;
+        let typingSpeed = 80;
+
+        pen.classList.add("pen-writing");
+
+        function typeWriter() {
+            if (i < textLines.length) {
+                if (textLines.substring(i, i + 4) === "<br>") {
+                    textContainer.innerHTML += "<br>";
+                    i += 4;
+                } else {
+                    textContainer.innerHTML += textLines.charAt(i);
+                    i++;
+                }
+                
+                // Перо всегда в конце текста (инлайновое)
+                setTimeout(typeWriter, typingSpeed + Math.random() * 40);
+            } else {
+                // Финал печати
+                pen.classList.remove("pen-writing");
+                setTimeout(() => {
+                    pen.style.opacity = "0";
+                    setTimeout(() => pen.style.display = 'none', 500);
+                    if (signature) signature.classList.remove("opacity-0");
+                    
+                    // Устанавливаем флаг, что всё показано
+                    section.classList.add('final-animation-complete');
+                }, 800);
+            }
+        }
+
+        setTimeout(typeWriter, 1000);
+    }
+
+    // Таймер Времени Вместе
+    // =================================================================
+    // Точная дата отсчета: 21 октября 2018 года.
+    // Safari/iOS часто ломается на 'YYYY-MM-DD', поэтому используем 'YYYY/MM/DD'
+    const startDate = new Date('2018/10/21 00:00:00'); 
+
+    // Используем уже существующую переменную visitDate, которая 
+    // фиксирует время, когда пользователь зашел на страницу
+    const fixedNow = visitDate;
+
+    // В задании сказано "до момента когда открывается сайт" + дальше сказано 
+    // "и сделай таймер который продолжает увеличиватся который считает время вместе".
+    // Значит начальное время нужно проецировать для таймера. 
+    function updateTimeTogether() {
+        const now = new Date(); // Берем текущее время, чтобы он тикал
+        const diffMs = now - startDate;
+
+        if (diffMs < 0) return; 
+
+        // Расчеты
+        const diffSeconds = Math.floor(diffMs / 1000);
+        const diffMinutes = Math.floor(diffSeconds / 60);
+        const diffHours = Math.floor(diffMinutes / 60);
+        const diffDays = Math.floor(diffHours / 24);
+        
+        // Годы с 1 знаком после запятой
+        const diffYears = (diffDays / 365.25).toFixed(1).replace('.', ',');
+
+        // Форматирование с пробелами
+        const formatNumber = (num) => {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        };
+
+        const daysEl = document.getElementById('time-days');
+        const yearsEl = document.getElementById('time-years');
+        const hoursEl = document.getElementById('time-hours');
+        const minutesEl = document.getElementById('time-minutes');
+        const secondsEl = document.getElementById('time-seconds');
+
+        if (daysEl) daysEl.textContent = formatNumber(diffDays);
+        if (yearsEl) yearsEl.textContent = diffYears;
+        if (hoursEl) hoursEl.textContent = formatNumber(diffHours);
+        if (minutesEl) minutesEl.textContent = formatNumber(diffMinutes);
+        if (secondsEl) secondsEl.textContent = formatNumber(diffSeconds);
+    }
+
+    updateTimeTogether();
+    setInterval(updateTimeTogether, 1000); // Таймер все еще "тикает", прибавляя секунды, как просили ранее.
 });
 
 // =================================================================
@@ -868,21 +1042,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(error => {
                 console.log("Автозапуск заблокирован браузером. Ждём взаимодействия...", error);
 
-                // Если браузер заблокировал запуск - стартуем при первом клике или скролле пользователя
-                // Важно: снимаем обработчики СРАЗУ при первом срабатывании, чтобы не запускать музыку 100 раз
                 const startOnInteraction = () => {
-                    document.removeEventListener('click', startOnInteraction);
-                    document.removeEventListener('touchstart', startOnInteraction);
-                    document.removeEventListener('scroll', startOnInteraction);
-
                     if (audio.paused) {
                         loadAndPlayTrack(currentTrackIndex, true);
                     }
+                    // Убираем со всех событий
+                    window.removeEventListener('click', startOnInteraction);
+                    window.removeEventListener('touchstart', startOnInteraction);
+                    window.removeEventListener('scroll', startOnInteraction);
                 };
 
-                document.addEventListener('click', startOnInteraction);
-                document.addEventListener('touchstart', startOnInteraction);
-                document.addEventListener('scroll', startOnInteraction);
+                window.addEventListener('click', startOnInteraction, { once: true });
+                window.addEventListener('touchstart', startOnInteraction, { once: true });
+                window.addEventListener('scroll', startOnInteraction, { once: true });
+                window.addEventListener('mousedown', startOnInteraction, { once: true });
+                window.addEventListener('keydown', startOnInteraction, { once: true });
             });
         }
     }

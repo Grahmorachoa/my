@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>С 8 Марта!</title>
     <!-- Подключаем CSS -->
-    <link rel="stylesheet" href="style.css?v=27">
+    <link rel="stylesheet" href="style.css?v=69">
     <!-- Классные шрифты от Google -->
     <!-- Cormorant Garamond для красивой восьмерки, Great Vibes для надписи -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,700&family=Great+Vibes&family=Montserrat:wght@400;600&family=Pacifico&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,700&family=Great+Vibes&family=Montserrat:wght@400;500;600&family=Pacifico&display=swap"
         rel="stylesheet">
 </head>
 
@@ -69,34 +69,42 @@
             <div class="letters-title">Листи тобі</div>
             <div class="letters-list">
                 <div class="letter-card" data-letter="1">
-                    <div class="letter-icon">💌</div>
+                    <div class="letter-icon">🍟</div>
                     <div class="letter-info">
-                        <div class="letter-subtitle">ПЕРШИЙ ЛИСТ</div>
-                        <div class="letter-name">Той вечір</div>
+                        <div class="letter-subtitle">ПЕРША ЗУСТРІЧ</div>
+                        <div class="letter-name">МакДональдз</div>
                     </div>
                     <div class="letter-arrow">›</div>
                 </div>
                 <div class="letter-card" data-letter="2">
-                    <div class="letter-icon">🌹</div>
+                    <div class="letter-icon">🌙</div>
                     <div class="letter-info">
-                        <div class="letter-subtitle">ТАЄМНЕ</div>
-                        <div class="letter-name">Що ти для мене</div>
+                        <div class="letter-subtitle">ТА НІЧ</div>
+                        <div class="letter-name">Нічна зупинка</div>
                     </div>
                     <div class="letter-arrow">›</div>
                 </div>
                 <div class="letter-card" data-letter="3">
-                    <div class="letter-icon">✨</div>
+                    <div class="letter-icon">🍕</div>
                     <div class="letter-info">
-                        <div class="letter-subtitle">ПРО НАС</div>
-                        <div class="letter-name">6 років — і ні секунди назад</div>
+                        <div class="letter-subtitle">ПІЦА</div>
+                        <div class="letter-name">Допоможеш зробити піцу?</div>
                     </div>
                     <div class="letter-arrow">›</div>
                 </div>
                 <div class="letter-card" data-letter="4">
-                    <div class="letter-icon">🌷</div>
+                    <div class="letter-icon">🛋️</div>
                     <div class="letter-info">
-                        <div class="letter-subtitle">СЬОГОДНІ</div>
-                        <div class="letter-name">8 Березня</div>
+                        <div class="letter-subtitle">П'ЯТНИЧНИЙ ВЕЧІР</div>
+                        <div class="letter-name">Диван, серіал...</div>
+                    </div>
+                    <div class="letter-arrow">›</div>
+                </div>
+                <div class="letter-card" data-letter="5">
+                    <div class="letter-icon">🎢</div>
+                    <div class="letter-info">
+                        <div class="letter-subtitle">ГІРКА В ЕНЕРДЖИЛАНДІЇ</div>
+                        <div class="letter-name">Маріо з "хворим серцем"</div>
                     </div>
                     <div class="letter-arrow">›</div>
                 </div>
@@ -128,7 +136,8 @@
                 <div class="game-win-content">
                     <div class="game-win-title">Ти зловила всі серця! 🌸</div>
                     <div class="game-win-subtitle">Також як і моє 💕</div>
-                    <button class="game-restart-btn" id="game-restart-btn" style="display:none;">Натисни ще раз щоб повторити</button>
+                    <button class="game-restart-btn" id="game-restart-btn" style="display:none;">Натисни ще раз щоб
+                        повторити</button>
                 </div>
             </div>
         </div>
@@ -143,13 +152,13 @@
         <!-- Секция Love Is -->
         <div class="loveis-section">
             <div class="loveis-title">Love is...</div>
-            
+
             <!-- Конверт с первым фото -->
             <div class="loveis-envelope-wrapper">
                 <div class="loveis-envelope" id="loveis-envelope">
                     <!-- Задняя стенка (самый нижний слой) -->
                     <div class="loveis-envelope-body"></div>
-                    
+
                     <!-- Карман конверта (для эффекта скрытия фото) -->
                     <div class="loveis-envelope-pocket">
                         <!-- Само письмо (фото + текст), лежит ВНУТРИ кармана -->
@@ -157,7 +166,7 @@
                             <img src="img/LoveIs.jpg" alt="Love Is" class="loveis-envelope-photo">
                             <div class="loveis-envelope-text">Мы с тобой прекрасные:)</div>
                         </div>
-                        
+
                         <!-- Боковые и передняя стенки кармана (поверх письма) -->
                         <div class="loveis-envelope-left"></div>
                         <div class="loveis-envelope-right"></div>
@@ -166,7 +175,7 @@
 
                     <!-- Сургучная печать (прикреплена к крышке или центру) -->
                     <div class="loveis-envelope-seal">♥</div>
-                    
+
                     <!-- Верхний клапан (крышка) - поверх всего когда закрыт -->
                     <div class="loveis-envelope-flap"></div>
                 </div>
@@ -244,7 +253,15 @@
                         </div>
                     </div>
                 </div>
+            </div> <!-- Конец loveis-grid -->
+        </div> <!-- Конец loveis-section -->
+
+
+            <!-- Скрытая кнопка финала — появляется после всех Love Is карточек -->
+            <div class="magic-trigger-container" id="final-trigger-wrapper" style="display:none; opacity:0; transition: opacity 1s ease;">
+                <button class="magic-trigger-btn" id="final-trigger-btn">Відкрити головний секрет ✨</button>
             </div>
+
         </div>
     </div>
 
@@ -287,7 +304,7 @@
         </div>
     </div>
 
-    <!-- Мини-плеер музыки -->
+    <!-- Виджет музыки -->
     <div class="music-widget" id="music-widget">
         <button class="music-icon" id="music-toggle">🎵</button>
         <button class="music-icon music-next" id="music-next">⏭</button>
@@ -298,8 +315,28 @@
 
     <!-- Аудио -->
     <audio id="bg-music" autoplay preload="auto"></audio>
+    <script src="script.js?v=69"></script>
 
-    <script src="script.js?v=15"></script>
+    <!-- ФИНАЛЬНЫЙ АККОРД ISTORII (Вынесен в корень для корректного z-index) -->
+    <section class="love-letter-section" id="love-letter-target" style="display:none;">
+        <button class="ll-close-btn" id="ll-close-btn">×</button>
+        <div class="ll-message-wrapper">
+            <div class="ll-date">8 БЕРЕЗНЯ 2026</div>
+            <h2 class="ll-title">З ЛЮБОВ'Ю</h2>
+            <div class="ll-typed-container">
+                <span id="ll-typed-text"></span>
+                <img src="img/Quill.svg" id="ll-pen" alt="Перо">
+            </div>
+        </div>
+        
+        <div class="ll-signature opacity-0" id="ll-sign" style="margin-top: 20px;">— Д І М А —</div>
+
+        <div class="festive-divider dark" style="margin-top: auto; margin-bottom: 50px; width: 90%; max-width: 600px;">
+            <span class="divider-line"></span>
+            <span class="divider-icon">TO BE CONTINUED...</span>
+            <span class="divider-line"></span>
+        </div>
+    </section>
 </body>
 
 </html>
