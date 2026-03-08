@@ -1341,14 +1341,14 @@ body {
 .loveis-envelope-letter {
     position: absolute;
     left: 50%;
-    bottom: -150px;
+    bottom: -320px; /* глубоко внутри конверта */
     transform: translateX(-50%);
     width: 274px;
-    height: 220px; /* фиксированная высота */
+    height: 340px; /* высокая карточка - фото видно целиком */
     background: #000;
-    border-radius: 8px;
-    padding: 0; /* без отступов */
-    overflow: hidden; /* чтоб фото не вылезало за рамку */
+    border-radius: 10px;
+    padding: 0;
+    overflow: hidden;
     box-shadow: 0 8px 30px rgba(0,0,0,0.25);
     display: flex;
     flex-direction: column;
@@ -1411,10 +1411,9 @@ body {
 
 .loveis-envelope.open .loveis-envelope-letter {
     bottom: 50px;
-    transform: translateX(-50%) translateY(-300px); /* чуть выше чтоб большая фо была видна */
+    transform: translateX(-50%) translateY(-390px); /* поднимаем выше чтоб всю карточку было видно */
     opacity: 1;
-    z-index: 6; 
-    /* Плавно, с задержкой пока открывается крышка */
+    z-index: 6;
     transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s, opacity 0.5s ease 0.6s;
 }
 
@@ -1451,15 +1450,15 @@ body {
     /* Письмо: немного уже, высота меньше */
     .loveis-envelope-letter {
         width: 236px;
-        height: 185px;
-        bottom: -150px;
+        height: 280px;
+        bottom: -280px;
     }
     .loveis-envelope-text {
         font-size: 1rem;
     }
-    /* Открытое состояние: выезжаем вверх */
+    /* Открытое состояние: выезжаем вверх выше, чтоб всю карточку видно */
     .loveis-envelope.open .loveis-envelope-letter {
-        transform: translateX(-50%) translateY(-230px);
+        transform: translateX(-50%) translateY(-320px);
     }
     /* Сердечко: положение + размер */
     .loveis-envelope-seal {
