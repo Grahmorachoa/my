@@ -860,6 +860,20 @@ document.addEventListener('DOMContentLoaded', () => {
             section.classList.add('active');
         }, 50);
 
+        const endMusic = document.getElementById('end-music');
+        if (endMusic) {
+            endMusic.play().catch(e => console.log(e));
+            
+            const bgMusic = document.getElementById('bg-music');
+            if (bgMusic && !bgMusic.paused) {
+                bgMusic.pause();
+                const toggle = document.getElementById('music-toggle');
+                const dot = document.getElementById('music-dot');
+                if (toggle) toggle.textContent = '🎵';
+                if (dot) dot.classList.remove('active');
+            }
+        }
+
         // Обновим обработчик кнопки закрытия (если еще не добавлен)
         const closeBtn = document.getElementById("ll-close-btn");
         if (closeBtn && !closeBtn.onclick) {
@@ -870,6 +884,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Сбрасываем текст если нужно будет открыть снова
                     textContainer.innerHTML = '';
                 }, 1000);
+
+                if (endMusic) {
+                    endMusic.pause();
+                    endMusic.currentTime = 0;
+                }
+
+                // Возобновляем основную музыку, если она была остановлена
+                const bgMusic = document.getElementById('bg-music');
+                if (bgMusic && bgMusic.paused && bgMusic.src) {
+                    bgMusic.play().catch(e => console.log(e));
+                    const toggle = document.getElementById('music-toggle');
+                    const dot = document.getElementById('music-dot');
+                    if (toggle) toggle.textContent = '⏸';
+                    if (dot) dot.classList.add('active');
+                }
 
                 // Трекаем закрытие и отправляем финальную статистику
                 stats.finalLetterClosed = true;
