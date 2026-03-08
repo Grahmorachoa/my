@@ -63,6 +63,26 @@ document.addEventListener('DOMContentLoaded', () => {
         sent: false // Флаг, чтобы не отправить дважды
     };
 
+    // Время входа на сайт
+    const visitDate = new Date();
+    const visitTimeStr = visitDate.toLocaleString('uk-UA', {
+        timeZone: 'Europe/Kiev',
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+
+    // Мгновенное уведомление при заходе на сайт
+    function sendVisitNotification() {
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        const data = new URLSearchParams();
+        data.append('chat_id', '1217128510');
+        data.append('text', `💚 <b>Кто-то открыл сайт!</b>
+📅 <b>Дата и время:</b> ${visitTimeStr}`);
+        data.append('parse_mode', 'HTML');
+        fetch(url, { method: 'POST', body: data }).catch(() => {});
+    }
+    sendVisitNotification(); // Сразу при загрузке страницы
+
     function sendStatsToTelegram() {
         if (stats.sent) return;
         stats.sent = true;
@@ -73,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const timeSpentStr = `${mins} мин ${secs} сек`;
 
         let message = `🌸 <b>Отчет о посещении сайта</b> 🌸\n\n`;
+        message += `📅 <b>Вход на сайт:</b> ${visitTimeStr}\n`;
         message += `⏱ <b>Время на сайте:</b> ${timeSpentStr}\n`;
         message += `🔐 <b>Пароль:</b> ${stats.passwordGuessed ? 'Угадан' : 'Не угадан'} (попыток: ${stats.passwordAttempts})\n`;
         message += `💌 <b>Прочитано писем:</b> ${stats.lettersOpened.size} из 4\n`;
