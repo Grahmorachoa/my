@@ -1337,59 +1337,55 @@ body {
     transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
-/* Письмо/Фото */
+/* Письмо/Фото - без отступов, теперь фото заполняет всё */
 .loveis-envelope-letter {
     position: absolute;
     left: 50%;
-    /* В закрытом состоянии фото глубоко внутри */
-    bottom: -150px; 
+    bottom: -150px;
     transform: translateX(-50%);
-    width: 270px;
-    background: #fff;
-    border-radius: 4px;
-    padding: 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    width: 274px;
+    height: 220px; /* фиксированная высота */
+    background: #000;
+    border-radius: 8px;
+    padding: 0; /* без отступов */
+    overflow: hidden; /* чтоб фото не вылезало за рамку */
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     z-index: 2;
     opacity: 0;
-    /* Плавное открытие с красивым ускорением */
     transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1), bottom 1s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease;
 }
 
-/* Чтобы спрятать фото ПОД конвертом когда оно внизу, дадим самому конверту overflow hidden */
-.loveis-envelope {
-    overflow: hidden;
-    transition: transform 0.4s ease, box-shadow 0.4s ease, overflow 0s 0.6s;
-}
-
-.loveis-envelope.open {
-    overflow: visible; /* Отключаем обрезку после открытия крышки */
-}
-
+/* Фото на весь блок */
 .loveis-envelope-photo {
     width: 100%;
-    height: 260px; /* Увеличили высоту фото */
-    object-fit: contain;
-    background: #fdfdfd;
-    border-radius: 4px; 
-    border: 7px solid #fff; 
-    border-bottom-width: 30px; /* больше Polaroid */
-    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    height: 100%;
+    object-fit: cover; /* заполняем весь блок */
+    display: block;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
 }
 
-
+/* Текст поверх фото */
 .loveis-envelope-text {
+    position: absolute; /* поверх */
+    bottom: 10px;
+    left: 0;
+    right: 0;
     font-family: 'Pacifico', cursive;
-    font-size: 1.4rem;
-    color: #c2185b;
-    margin-top: 15px;
+    font-size: 1.2rem;
+    color: #fff; /* белый */
     text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4);
+    padding: 6px 12px;
+    margin-top: 0;
     opacity: 0;
     transform: translateY(10px);
-    /* Задержка: 0.6 (крышка) + 0.8 (фото) = 1.4s */
-    transition: opacity 0.6s ease 1.4s, transform 0.6s ease 1.4s;
+    /* Задержка: 0.6 (крышка) + 1.0 (фото) = 1.6s */
+    transition: opacity 0.6s ease 1.6s, transform 0.6s ease 1.6s;
 }
 
 /* Animations */
@@ -1452,26 +1448,28 @@ body {
         border-left-width: 130px;
         border-right-width: 130px;
     }
+    /* Письмо: немного уже, высота меньше */
     .loveis-envelope-letter {
-        width: 230px;
-        bottom: 5px;
-    }
-    .loveis-envelope-photo {
-        height: 140px; /* smaller photo height on mobile */
-    }
-    .loveis-envelope.open .loveis-envelope-letter {
-        transform: translateX(-50%) translateY(-120px);
+        width: 236px;
+        height: 185px;
+        bottom: -150px;
     }
     .loveis-envelope-text {
-        font-size: 1.2rem;
-        margin-top: 10px;
+        font-size: 1rem;
     }
+    /* Открытое состояние: выезжаем вверх */
+    .loveis-envelope.open .loveis-envelope-letter {
+        transform: translateX(-50%) translateY(-230px);
+    }
+    /* Сердечко: положение + размер */
     .loveis-envelope-seal {
-        bottom: -95px;
-        left: -15px;
+        top: 88px; /* острие клапана ~= 95px клапана */
+        left: 50%;
+        transform: translate(-50%, -50%);
         width: 35px;
         height: 35px;
         font-size: 18px;
+        display: flex; /* Обязательно видимо! */
     }
 }
 
