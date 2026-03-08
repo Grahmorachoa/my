@@ -60,8 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gamesPlayed: 0,
         gameWins: 0,
         cardsFlipped: new Set(),
+        envelopeOpened: false, // Открыт ли конверт в Love Is
+        magicCardShown: false, // Показала ли финальная карточка
         sent: false // Флаг, чтобы не отправить дважды
     };
+
+    // Названия писем (для отчёта Telegram)
+    const LETTER_NAMES = ['1. "Первое"', '2. "Послание"', '3. "Обещание"', '4. "Секрет"'];
+    const LOVEIS_NAMES = ['1. "Счасть"', '2. "Путешествия"', '3. "Ранцы"', '4. "Моменты"', '5. "Объятия"', '6. "Безумолчание"'];
 
     // Время входа на сайт
     const visitDate = new Date();
@@ -92,25 +98,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const secs = timeSpentSec % 60;
         const timeSpentStr = `${mins} мин ${secs} сек`;
 
-        let message = `🌸 <b>Отчет о посещении сайта</b> 🌸\n\n`;
-        message += `📅 <b>Вход на сайт:</b> ${visitTimeStr}\n`;
-        message += `⏱ <b>Время на сайте:</b> ${timeSpentStr}\n`;
-        message += `🔐 <b>Пароль:</b> ${stats.passwordGuessed ? 'Угадан' : 'Не угадан'} (попыток: ${stats.passwordAttempts})\n`;
-        message += `💌 <b>Прочитано писем:</b> ${stats.lettersOpened.size} из 4\n`;
-        if (stats.lettersOpened.size > 0) {
-            message += `   (Номера: ${Array.from(stats.lettersOpened).sort().join(', ')})\n`;
-        }
-        message += `🎯 <b>Игр сыграно:</b> ${stats.gamesPlayed} (Побед: ${stats.gameWins})\n`;
-        message += `💕 <b>Карточек "Love is" перевернуто:</b> ${stats.cardsFlipped.size} из 6\n`;
+        // Цвет индикатора пароля
+        const pwdIcon = stats.passwordGuessed ? '✅' : '❌';
 
-        // Используем sendBeacon чтобы запрос ушел 100% при закрытии вкладки
+        let message = `🌸 <b>Отчёт о посещении</b> 🌸\n`;
+        message += `―――――――――――――\n`;
+        message += `📅 <b>Интро:</b> ${visitTimeStr}\n`;
+        message += `⏱ <b>Провела на сайте:</b> ${timeSpentStr}\n`;
+        message += `―――――――――――――\n`;
+        message += `${pwdIcon} <b>Пароль:</b> ${stats.passwordGuessed ? 'Угадана ❤️' : 'Не угадан'} (${stats.passwordAttempts} попыток)\n`;
+        if (stats.lettersOpened.size > 0) {
+            const openedNames = Array.from(stats.lettersOpened).sort().map(i => LETTER_NAMES[i] || `№${i+1}`).join(', ');
+            message += `💌 <b>Письма:</b> Открыла ${stats.lettersOpened.size} из 4\n   ${openedNames}\n`;
+        } else {
+            message += `💌 <b>Письма:</b> Не читала — 0 из 4\n`;
+        }
+        message += `🎮 <b>Игра:</b> ${stats.gamesPlayed > 0 ? `Сыграла ${stats.gamesPlayed} раз, победила ${stats.gameWins}` : 'Не играла'}\n`;
+        if (stats.cardsFlipped.size > 0) {
+            const loveNames = Array.from(stats.cardsFlipped).sort().map(i => LOVEIS_NAMES[i] || `№${i+1}`).join(', ');
+            message += `💕 <b>Love Is:</b> Перевернула ${stats.cardsFlipped.size} из 6\n   ${loveNames}\n`;
+        } else {
+            message += `💕 <b>Love Is:</b> Карточки не открывала\n`;
+        }
+        message += `✉️ <b>Конверт:</b> ${stats.envelopeOpened ? 'Открыла 💌' : 'Не открывала'}\n`;
+        message += `✨ <b>Финальная карточка:</b> ${stats.magicCardShown ? 'Увидела 🌟' : 'Не дошла'}\n`;
+
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         const data = new URLSearchParams();
         data.append('chat_id', '1217128510');
         data.append('text', message);
         data.append('parse_mode', 'HTML');
-
-        // Для надежности дублируем fetch(keepalive) и sendBeacon
         navigator.sendBeacon(url, data);
     }
 
@@ -641,7 +658,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             if (sparkCtx) sparkCtx.clearRect(0, 0, sparkCanvas.width, sparkCanvas.height);
-            if (cardEl) cardEl.classList.add('visible');
+            if (cardEl) {
+                cardEl.classList.add('visible');
+                stats.magicCardShown = true; // записываем
+            }
         }, 1600);
     }
 
@@ -651,8 +671,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (loveisEnvelope) {
         loveisEnvelope.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent immediate close if click bubbles
+            e.stopPropagation();
             loveisEnvelope.classList.toggle('open');
+            if (loveisEnvelope.classList.contains('open')) {
+                stats.envelopeOpened = true; // записываем факт открытия
+            }
         });
 
         // Закрывать при скролле в контейнере screen-two
